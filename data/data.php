@@ -4,7 +4,7 @@ $clients = [
         'id' => 1,
         'nom' => 'khady',
         'prenom' => 'Camara',
-        'telephone' => '759876543',
+        'telephone' => '77',
         'commande' => [
             [
                 'id' => 1, 

@@ -65,25 +65,41 @@ switch ($page) {
         if (!empty($_GET['telephone'])) {
             
             $telephone = trim($_GET['telephone']);
-            
             $client = getClientByTelephone($telephone);
             $_SESSION["client"]=$client;
             if ($client) {
                 $nom = $client['nom'];
-                $prenom = $client['prenom'];
+                $prenom = $client['prenom']; 
             }
         }
        
         
-        // Ajout d'un produit à la commande
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!empty($_POST['produit']) && !empty($_POST['prix']) && !empty($_POST['quantite'])) {
-                $_SESSION['commandes'][] = [
-                    'produit' => htmlspecialchars($_POST['produit']),
-                    'prix' => (int) $_POST['prix'],
-                    'quantite' => (int) $_POST['quantite'],
-                ];
+                $produit = htmlspecialchars($_POST['produit']);
+                $prix = (int) $_POST['prix'];
+                $quantite = (int) $_POST['quantite'];
+                $trouve = false;
+        
+                foreach ($_SESSION['commandes'] as $index => $commande) {
+                    if ($commande['produit'] === $produit && $commande['prix'] === $prix) {
+                        // Mise à jour de la quantité si le produit existe déjà
+                        $_SESSION['commandes'][$index]['quantite'] += $quantite;
+                        $_SESSION['commandes'][$index]['prix'] = $prix;
+                        $trouve = true;
+                        break;
+                    }
+                }
+        
+                if (!$trouve) {
+                    $_SESSION['commandes'][] = [
+                        'produit' => $produit,
+                        'prix' => $prix,
+                        'quantite' => $quantite,
+                    ];
+                }
             }
+        
             header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
             exit();
         }
@@ -102,6 +118,21 @@ switch ($page) {
         header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
         exit();
         break;
+
+    case "modifier_commande":
+        if (isset($_GET['index']) && isset($_POST['produit']) && isset($_POST['quantite']) && isset($_POST['prix'])) {
+            $index = (int) $_GET['index'];
+        
+            if (isset($_SESSION['commandes'][$index])) {
+                    $_SESSION['commandes'][$index]['produit'] = $_POST['produit'];
+                    $_SESSION['commandes'][$index]['quantite'] = (int) $_POST['quantite'];
+                    $_SESSION['commandes'][$index]['prix'] = (float) $_POST['prix'];
+                }
+            }
+            header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
+            exit();
+            break;
+        
     
     default:
         echo "Page introuvable !";
