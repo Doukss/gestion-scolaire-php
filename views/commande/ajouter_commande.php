@@ -13,9 +13,9 @@
         <h1 class="text-2xl font-semibold text-center text-blue-500 mb-5">Ajouter une Commande</h1>
 
         <!-- Formulaire de recherche client -->
-        <form action="<?= WEBROOT ?>controller=commande&page=ajouter_commande" method="GET" class="flex items-center space-x-2">
+        <form action="<?= WEBROOT ?>controller=commande&page=ajout" method="GET" class="flex items-center space-x-2">
             <input type="hidden" name="controller" value="commande">
-            <input type="hidden" name="page" value="ajouter_commande">
+            <input type="hidden" name="page" value="ajout">
             <input type="text" name="telephone" placeholder="Téléphone..." class="border border-gray-300 rounded-lg p-2 w-full">
             <button type="submit" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">OK</button>
         </form>
@@ -27,11 +27,12 @@
         </div>
 
         <!-- Formulaire Ajout Produit -->
-        <form action="<?= WEBROOT ?>controller=commande&page=ajouter_commande" method="POST" class="mt-6 space-y-2">
+        <form action="<?= WEBROOT ?>controller=commande&page=ajout" method="POST" class="mt-6 space-y-2">
             <div class="grid grid-cols-3 gap-4">
-                <input type="text" name="produit" placeholder="Produit" class="border border-gray-300 p-2 rounded-lg">
-                <input type="number" name="prix" placeholder="Prix" class="border border-gray-300 p-2 rounded-lg">
-                <input type="number" name="quantite" placeholder="Quantité" class="border border-gray-300 p-2 rounded-lg">
+            <input type="hidden" name="edit_index" value="<?= isset($index) ? $index : "" ?>">
+            <input type="text" value="<?= $produitTrouver["nom"] ?? "" ?>" name="nom" placeholder="Produit" class="border border-gray-300 p-2 rounded-lg">
+                <input type="number" value="<?= $produitTrouver["prix"] ?? "" ?>" name="prix" placeholder="Prix" class="border border-gray-300 p-2 rounded-lg">
+                <input type="number" value="<?= $produitTrouver["quantite"] ?? "" ?>" name="quantite" placeholder="Quantité" class="border border-gray-300 p-2 rounded-lg">
             </div>
             <button type="submit" class="bg-blue-400 rounded-lg text-white px-4 py-2 w-full hover:bg-blue-600 transition">Ajouter</button>
         </form>
@@ -49,16 +50,16 @@
                     </tr>
                 </thead>
                 <tbody class="bg-gray-100">
-                    <?php if (!empty($_SESSION['commandes'])): ?>
-                        <?php foreach ($_SESSION['commandes'] as $index => $commande): ?>
+                    <?php if (!empty($_SESSION['produits'])): ?>
+                        <?php foreach ($_SESSION['produits'] as $index => $commande): ?>
                             <tr class="border-b">
-                                <td class="border p-2"><?= htmlspecialchars($commande['produit']) ?></td>
+                                <td class="border p-2"><?= htmlspecialchars($commande['nom']) ?></td>
                                 <td class="border p-2"><?= htmlspecialchars($commande['prix']) ?> f</td>
                                 <td class="border p-2"><?= htmlspecialchars($commande['quantite']) ?></td>
                                 <td class="border p-2 font-semibold"><?= $commande['prix'] * $commande['quantite'] ?> f</td>
                                 <td class="border p-2 flex space-x-2 justify-center">
-                                    <a href="<?= WEBROOT ?>controller=commande&page=modifier_commande&index=<?= $index ?>" class="text-blue-500 hover:text-blue-700"><i class="ri-edit-line text-xl"></i></a>
-                                    <a href="<?= WEBROOT ?>controller=commande&page=supprimer_commande&index=<?= $index ?>" class="text-red-500 hover:text-red-700"><i class="ri-delete-bin-line text-xl"></i></a>
+                                    <a href="<?= WEBROOT ?>controller=commande&page=ajout&edit=<?= $index ?>" class="text-blue-500 hover:text-blue-700"><i class="ri-edit-line text-xl"></i></a>
+                                    <a href="<?= WEBROOT ?>controller=commande&page=ajout&delete=<?= $index ?>" class="text-red-500 hover:text-red-700"><i class="ri-delete-bin-line text-xl"></i></a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -73,7 +74,7 @@
 
         <!-- Total et Validation -->
         <div class="flex justify-between items-center mt-6">
-            <p class="text-xl font-bold">Total : <?= array_sum(array_map(fn($c) => $c['prix'] * $c['quantite'], $_SESSION['commandes'] ?? [])) ?> FCFA</p>
+            <p class="text-xl font-bold">Total : <?= array_sum(array_map(fn($c) => $c['prix'] * $c['quantite'], $_SESSION['produits'] ?? [])) ?> FCFA</p>
             <button class="bg-green-500 rounded-lg text-white px-6 py-2 hover:bg-green-600 transition">Commander</button>
         </div>
     </div>

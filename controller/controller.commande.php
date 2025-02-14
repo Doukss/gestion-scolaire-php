@@ -1,13 +1,8 @@
 <?php
 session_start();
 
-// Vérifie si la variable session 'commandes' existe sinon l'initialise
-if (!isset($_SESSION['commandes'])) {
-    $_SESSION['commandes'] = [];
-}
-
 // Récupère la page demandée ou définit une page par défaut
-$page = $_GET["page"] ?? "ajouter_commande";
+$page = isset($_GET["page"]) ? $_GET["page"] : "liste.commande";;
 
 switch ($page) {
 
@@ -32,108 +27,79 @@ switch ($page) {
         require_once "../views/commande/detail_commande.php";
         break;
 
-    //  Ajout d'un client
-    case "ajouter_client":
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nom = $_POST['nom'] ?? '';
-            $prenom = $_POST['prenom'] ?? '';
-            $telephone = $_POST['telephone'] ?? '';
-
-            if (!empty($nom) && !empty($prenom) && !empty($telephone)) {
-                addClient($nom, $prenom, $telephone);
-                header("Location: " . WEBROOT . "controller=client&page=liste_clients");
-                exit;
-            } else {
-                $error = "Tous les champs sont obligatoires.";
-            }
-        }
-        require_once "../views/client/ajouter_client.php";
-        break;
-
-    //  Liste de toutes les commandes
     case "liste.commande":
         $commandes = getAllCommandes();
         require_once "../views/commande/liste.commande.php";
         break;
 
     //  Ajout d'une commande (via formulaire)
-    case "ajouter_commande":
-      
-        $commandes = $_SESSION['commandes'];
-        
+    case "ajout":
+        // unset($_SESSION["produits"]);
         // Recherche d'un client par téléphone
-        if (!empty($_GET['telephone'])) {
+       
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+            if (isset($_GET['telephone'])) {
             
-            $telephone = trim($_GET['telephone']);
-            $client = getClientByTelephone($telephone);
-            $_SESSION["client"]=$client;
-            if ($client) {
-                $nom = $client['nom'];
-                $prenom = $client['prenom']; 
+                $telephone = trim($_GET['telephone']);
+                $client = getClientByTelephone($telephone);
+                $_SESSION["client"]=$client;
+                if ($client) {
+                    $nom = $client['nom'];
+                    $prenom = $client['prenom']; 
+                }
+            }
+            if (isset($_GET['delete'])) {
+                $index = (int) $_GET['delete'];
+                if (isset($_SESSION['produits'][$index])) {
+                    unset($_SESSION['produits'][$index]);
+                    $_SESSION['produits'] = array_values($_SESSION['produits']);
+                }
+                header("Location: " . WEBROOT . "controller=commande&page=ajout");
+                exit;
+            }
+            if (isset($_GET['edit'])) {
+                $index = (int) $_GET['edit'];
+                if (isset($_SESSION['produits'][$index])) {
+                    $produitTrouver = $_SESSION['produits'][$index];
+                }
             }
         }
        
         
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            if (!empty($_POST['produit']) && !empty($_POST['prix']) && !empty($_POST['quantite'])) {
-                $produit = htmlspecialchars($_POST['produit']);
-                $prix = (int) $_POST['prix'];
-                $quantite = (int) $_POST['quantite'];
-                $trouve = false;
-        
-                foreach ($_SESSION['commandes'] as $index => $commande) {
-                    if ($commande['produit'] === $produit && $commande['prix'] === $prix) {
-                        // Mise à jour de la quantité si le produit existe déjà
-                        $_SESSION['commandes'][$index]['quantite'] += $quantite;
-                        $_SESSION['commandes'][$index]['prix'] = $prix;
-                        $trouve = true;
-                        break;
-                    }
+            if (!empty($_POST['nom']) && !empty($_POST['prix']) && !empty($_POST['quantite'])) {
+                if (!isset($_SESSION['produits'])) {
+                    $_SESSION['produits'] = [];
                 }
         
-                if (!$trouve) {
-                    $_SESSION['commandes'][] = [
-                        'produit' => $produit,
+                $nom = htmlspecialchars($_POST['nom']);
+                $prix = (int)$_POST['prix'];
+                $quantite = (int)$_POST['quantite'];
+        
+                // Vérifier si c'est une modification
+                if (isset($_POST["edit_index"]) && $_POST["edit_index"] !== "") {
+                    $index = (int)$_POST["edit_index"]; // Récupère l'index à modifier
+                    if (isset($_SESSION['produits'][$index])) {
+                        $_SESSION['produits'][$index]['nom'] = $nom;
+                        $_SESSION['produits'][$index]['quantite'] = $quantite;
+                        $_SESSION['produits'][$index]['prix'] = $prix;
+                    }
+                } else {
+                    // Ajouter un nouveau produit si ce n'est pas une modification
+                    $_SESSION['produits'][] = [
+                        'nom' => $nom,
                         'prix' => $prix,
                         'quantite' => $quantite,
                     ];
                 }
             }
         
-            header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
+            header("Location: " . WEBROOT . "controller=commande&page=ajout");
             exit();
         }
         
         require_once "../views/commande/ajouter_commande.php";
         break;
-
-    case "supprimer_commande":
-        if (isset($_GET['index'])) {
-            $index = (int) $_GET['index'];
-            if (isset($_SESSION['commandes'][$index])) {
-                unset($_SESSION['commandes'][$index]);
-                $_SESSION['commandes'] = array_values($_SESSION['commandes']);
-            }
-        }
-        header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
-        exit();
-        break;
-
-    case "modifier_commande":
-        if (isset($_GET['index']) && isset($_POST['produit']) && isset($_POST['quantite']) && isset($_POST['prix'])) {
-            $index = (int) $_GET['index'];
-        
-            if (isset($_SESSION['commandes'][$index])) {
-                    $_SESSION['commandes'][$index]['produit'] = $_POST['produit'];
-                    $_SESSION['commandes'][$index]['quantite'] = (int) $_POST['quantite'];
-                    $_SESSION['commandes'][$index]['prix'] = (float) $_POST['prix'];
-                }
-            }
-            header("Location: " . WEBROOT . "controller=commande&page=ajouter_commande");
-            exit();
-            break;
-        
-    
     default:
         echo "Page introuvable !";
         exit();

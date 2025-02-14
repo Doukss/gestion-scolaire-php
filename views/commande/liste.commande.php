@@ -26,7 +26,7 @@
     </div>
 
     <div class="ml-[92%] mb-5 bg-blue-400 rounded w-20 h-6 rounded text-center text-white">
-    <a href="<?= WEBROOT ?>controller=commande&page=ajouter_commande ">Nouveau</a>
+    <a href="<?= WEBROOT ?>controller=commande&page=ajout">Nouveau</a>
     </div>
     
     <div class="bg-white shadow p-10 rounded mt-5 w-[90%] mx-auto">
