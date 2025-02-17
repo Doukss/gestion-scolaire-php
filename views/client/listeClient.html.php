@@ -1,22 +1,10 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Clients</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css">
-</head>
-<body class="bg-gray-200">
-<div class="bg-blue-400  text-white flex ">
-    <h1 class="text-xl font-bold">GESTION CLIENTS</h1>
-    <div class="ml-10 flex gap-5">
-    <a href="<?= WEBROOT ?>controller=client&page=liste">Clients</a>
-    <a href="<?= WEBROOT ?>controller=commande&page=liste.commande">Commandes</a>
-    </div>
-    </div>
-    <div class="bg-gray-400 text-center text-white">
+<?php 
+?>
+
+
+   <main>
+   <div class="bg-gray-400 text-center text-white">
     <h1 class="text-xl font-bold">LISTE DES CLIENTS</h1>
     </div>
     <div class="mt-20 rounded flex items-center justify-between">
@@ -68,7 +56,7 @@
                         <?php if ($current_page > 1): ?>
                             <a href="?page=liste&p=<?= $current_page - 1 ?>" class="px-3 py-2 self-center rounded  border border-gray-300  hover:bg-gray-100">Précédent</a>
                         <?php endif; ?>
-
+                        
                         <?php for ($i = 1; $i <= $totalPages; $i++): ?>
                             <a href="?page=liste&p=<?= $i ?>" class="h-10 w-10 rounded flex items-center justify-center border border-gray-300  hover:bg-blue-400 hover:text-white <?= $i == $current_page ? 'bg-blue-300 text-white' : '' ?>">
                                 <?= $i ?>
@@ -81,5 +69,5 @@
                     </div>
       </div>
     </div>
-</body>
-</html>
+   </main>
+

@@ -28,14 +28,16 @@ switch ($page) {
         break;
 
     case "liste.commande":
+        ob_start();
         $commandes = getAllCommandes();
         require_once "../views/commande/liste.commande.php";
+$content = ob_get_clean();
+require_once "../views/layout/base.layout.php";
         break;
 
     //  Ajout d'une commande (via formulaire)
     case "ajout":
-        // unset($_SESSION["produits"]);
-        // Recherche d'un client par téléphone
+    
        
         if ($_SERVER['REQUEST_METHOD'] == 'GET') {
             if (isset($_GET['telephone'])) {
@@ -54,7 +56,7 @@ switch ($page) {
                     unset($_SESSION['produits'][$index]);
                     $_SESSION['produits'] = array_values($_SESSION['produits']);
                 }
-                header("Location: " . WEBROOT . "controller=commande&page=ajout");
+                redirect("commande", "ajout");
                 exit;
             }
             if (isset($_GET['edit'])) {
@@ -75,17 +77,26 @@ switch ($page) {
                 $nom = htmlspecialchars($_POST['nom']);
                 $prix = (int)$_POST['prix'];
                 $quantite = (int)$_POST['quantite'];
+                $produitExiste = false;
+        
+                // Vérifier si le produit existe déjà
+                foreach ($_SESSION['produits'] as $index => $produit) {
+                    if ($produit['nom'] === $nom && $produit['prix'] === $prix) {
+                        $_SESSION['produits'][$index]['quantite'] += $quantite;
+                        $produitExiste = true;
+                        break;
+                    }
+                }
         
                 // Vérifier si c'est une modification
                 if (isset($_POST["edit_index"]) && $_POST["edit_index"] !== "") {
-                    $index = (int)$_POST["edit_index"]; // Récupère l'index à modifier
+                    $index = (int)$_POST["edit_index"]; 
                     if (isset($_SESSION['produits'][$index])) {
                         $_SESSION['produits'][$index]['nom'] = $nom;
                         $_SESSION['produits'][$index]['quantite'] = $quantite;
                         $_SESSION['produits'][$index]['prix'] = $prix;
                     }
-                } else {
-                    // Ajouter un nouveau produit si ce n'est pas une modification
+                } elseif (!$produitExiste) {
                     $_SESSION['produits'][] = [
                         'nom' => $nom,
                         'prix' => $prix,
@@ -94,9 +105,26 @@ switch ($page) {
                 }
             }
         
-            header("Location: " . WEBROOT . "controller=commande&page=ajout");
+            redirect("commande", "ajout");
             exit();
         }
+
+        if (isset($_POST['commander'])) {
+            if (empty($_SESSION['produits'])) {
+                echo "<p>Aucune commande à valider.</p>";
+            } else {
+                $_SESSION['commande'][] = [
+                    'client_id' => $_SESSION["client"]["id"],
+                    'produits' => $_SESSION['produits'],
+                    'total' => array_sum(array_map(fn($c) => $c['prix'] * $c['quantite'], $_SESSION['produits']))
+                ];
+                unset($_SESSION['produits']);
+                header("Location: " . WEBROOT . "?controller=commande&page=liste.commande");
+                exit();
+            }
+        }
+        
+        
         
         require_once "../views/commande/ajouter_commande.php";
         break;
@@ -105,3 +133,5 @@ switch ($page) {
         exit();
 }
 ?>
+
+

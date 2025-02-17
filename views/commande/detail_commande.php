@@ -1,25 +1,9 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail Commande</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.min.css">
-</head>
-<body class="bg-gray-200">
+<?php require_once '../layout/healpers.php'; ?>
 
-    <!-- Header -->
-    <div class="bg-blue-400 text-white flex gap-5">
-        <h1 class="text-xl font-bold">GESTION CLIENTS</h1>
-        <div class="flex gap-5">
-            <a href="<?= WEBROOT ?>controller=client&page=liste">Clients</a>
-            <a href="<?= WEBROOT ?>controller=commande&page=commande&client_id=<?= $_GET['client_id'] ?>">Commandes</a>
-        </div>
-    </div>
 
-    <!-- Titre -->
-    <div class="bg-gray-400 text-center text-white">
+   <main>
+     <!-- Titre -->
+     <div class="bg-gray-400 text-center text-white">
         <h1 class="text-xl font-bold">DÉTAIL DE LA COMMANDE</h1>
     </div>
 
@@ -70,6 +54,5 @@
             Retour
         </a>
     </div>
+   </main>
 
-</body>
-</html>

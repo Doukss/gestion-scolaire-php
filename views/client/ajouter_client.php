@@ -7,13 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-200">
-    <div class="bg-blue-400 text-white flex">
-        <h1 class="text-xl font-bold">GESTION CLIENTS</h1>
-        <div class="ml-10 flex gap-5">
-            <a href="<?= WEBROOT ?>controller=client&page=liste_clients">Liste des Clients</a>
-        </div>
-    </div>
-
+    
     <div class="bg-gray-400 text-center text-white">
         <h1 class="text-xl font-bold">AJOUTER UN CLIENT</h1>
     </div>

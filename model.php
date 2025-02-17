@@ -34,8 +34,6 @@ function getClientById($id) {
      if (!isset($clients) || !is_array($clients)) {
         return null; // Retournez null si $clients est invalide
     }
-
-
     foreach ($clients as $client) {
         if ($client['id'] == $id) {
             return $client;
@@ -100,6 +98,22 @@ function addClient($nom, $prenom, $telephone) {
     
     return true;
 }
+
+
+function redirect($controller, $page, $params = [])
+{
+    $url = WEBROOT . "?controller=" . $controller . "&page=" . $page;
+    
+    if (!empty($params)) {
+        $queryString = http_build_query($params);
+        $url .= "&" . $queryString;
+    }
+
+    header("Location: " . $url);
+    exit();
+}
+
+
 
 function dd($data) {
     echo "<pre>";
